@@ -1,8 +1,17 @@
 node_modules/
 dist/
+# ===== 機密（資安鐵則，絕不上 GitHub）=====
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+secrets*.json
 *.log
 .DS_Store
 Thumbs.db
+
+# ===== 機密補齊（rule-security 第 6 條）=====
+appsettings.*.local.json
+.claude/settings.local.json

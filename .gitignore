@@ -15,3 +15,5 @@ Thumbs.db
 # ===== 機密補齊（rule-security 第 6 條）=====
 appsettings.*.local.json
 .claude/settings.local.json
+*.p12
+credentials*.json

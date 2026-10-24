@@ -8,7 +8,11 @@ fail=0
 echo "== 1. 檢查 gitleaks"
 if ! command -v gitleaks >/dev/null 2>&1; then
   echo "   沒裝，自動安裝中（約 1 分鐘）..."
-  winget.exe install --id Gitleaks.Gitleaks -e --accept-source-agreements --accept-package-agreements >/dev/null
+  if command -v winget.exe >/dev/null 2>&1; then
+    winget.exe install --id Gitleaks.Gitleaks -e --accept-source-agreements --accept-package-agreements >/dev/null 2>&1
+  else
+    echo "   這台電腦沒有 winget（Windows 內建的「應用程式安裝程式」），請到 Microsoft Store 安裝後再雙擊一次。"
+  fi
 fi
 if command -v gitleaks >/dev/null 2>&1; then
   echo "   [成功] gitleaks $(gitleaks version)"

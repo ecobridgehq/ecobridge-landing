@@ -15,7 +15,7 @@ fi
 # 1. 禁止版控的檔名（第 6 條清單）
 # quotepath=off：中文檔名原樣輸出才比對得到；-i：Windows 檔名不分大小寫
 bad=$(git -c core.quotepath=off diff --cached --name-only --diff-filter=ACMR \
-  | grep -iE '(^|/)(\.env(\.[^/]*)?|[^/]*\.(pem|key|pfx)|secrets[^/]*\.json|appsettings\.[^/]*\.local\.json|\.claude/settings\.local\.json)$' \
+  | grep -iE '(^|/)(\.env(\.[^/]*)?|[^/]*\.(pem|key|pfx|p12)|(secrets|credentials)[^/]*\.json|appsettings\.[^/]*\.local\.json|\.claude/settings\.local\.json)$' \
   | grep -iv '\.env\.example$')
 if [ -n "$bad" ]; then
   echo "[pre-commit] 暫存區有禁止版控的檔案，已擋下 commit："

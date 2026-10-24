@@ -1,0 +1,29 @@
+#!/bin/sh
+# EcoBridge 資安鐵則第 7 條：commit 前自動檢查（rule-security.md）
+# 啟用：git config core.hooksPath .githooks
+# 沒裝 gitleaks 一律擋下，避免新電腦忘了裝卻以為有在檢查。
+
+# winget 安裝後舊終端機可能還沒吃到新 PATH
+PATH="$PATH:$LOCALAPPDATA/Microsoft/WinGet/Links:/c/Users/$USERNAME/AppData/Local/Microsoft/WinGet/Links"
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "[pre-commit] 找不到 gitleaks，已擋下 commit。"
+  echo "             請先執行：winget install --id Gitleaks.Gitleaks -e"
+  exit 1
+fi
+
+# 1. 禁止版控的檔名（第 6 條清單）
+bad=$(git diff --cached --name-only --diff-filter=ACMR \
+  | grep -E '(^|/)(\.env(\.[^/]*)?|[^/]*\.(pem|key|pfx)|secrets[^/]*\.json|appsettings\.[^/]*\.local\.json|\.claude/settings\.local\.json)$' \
+  | grep -v '\.env\.example$')
+if [ -n "$bad" ]; then
+  echo "[pre-commit] 暫存區有禁止版控的檔案，已擋下 commit："
+  echo "$bad" | sed 's/^/             /'
+  exit 1
+fi
+
+# 2. 內容掃金鑰（結果遮罩，不印出機密值）
+if ! gitleaks git --staged --redact --no-banner --exit-code 1 .; then
+  echo "[pre-commit] gitleaks 發現疑似金鑰，已擋下 commit。依第 9 條：先作廢金鑰，再清理。"
+  exit 1
+fi

@@ -20,7 +20,7 @@ fi
 echo "== 2. 啟用各 repo 的檢查"
 for d in "$root" "$root"/repos/*/; do
   [ -d "$d" ] || continue
-  name="${d#"$root"}"; name="${name%/}"; [ -z "$name" ] && name="$(basename "$root")"
+  if [ "$d" = "$root" ]; then name="$(basename "$root")（hub）"; else name="${d#"$root"/}"; name="${name%/}"; fi
   if [ ! -d "$d/.git" ]; then
     echo "   [略過] $name 尚未 git init（init 或 clone 後請再雙擊一次 setup.cmd）"
   elif [ ! -f "$d/.githooks/pre-commit" ]; then
@@ -38,7 +38,7 @@ done
 echo "== 3. 實際試擋（在暫存資料夾，不影響真實 repo）"
 t="$(mktemp -d)"
 git init -q "$t" && cd "$t" || exit 1
-git config core.hooksPath "$here"; git config user.email test@local; git config user.name test
+git config core.autocrlf false; git config core.hooksPath "$here"; git config user.email test@local; git config user.name test
 try() { # $1=說明 $2=預期(block|pass)
   if git commit -q -m test >/dev/null 2>&1; then got=pass; else got=block; fi
   if [ "$got" = "$2" ]; then echo "   [成功] $1"; else echo "   [失敗] $1"; fail=1; fi
